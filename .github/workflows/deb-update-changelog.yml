@@ -13,10 +13,6 @@ env:
 jobs:
   bump-changelog-on-pr:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: write
     # if last commit was not a merge of the changelog
     # env vars can't be used in if checks
     if: ${{ ! contains(github.event.head_commit.message, 'New changelog entry:') }}
@@ -48,18 +44,9 @@ jobs:
         run: sudo chmod -R ugo+rwX .git
 
       - name: Create Pull Request
-        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "${{ env.COMMIT_MESSAGE_PREFIX }} v${{ steps.bump_changelog.outputs.version }}"
           branch: bump-changelog
           title: "${{ env.COMMIT_MESSAGE_PREFIX }} v${{ steps.bump_changelog.outputs.version }}"
           body: ""
-
-      - name: Build the pull request
-        # The PR's own build waits for approval because GITHUB_TOKEN opened it;
-        # a dispatched build does not, and satisfies the required check
-        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run deb-build.yml --repo "${{ github.repository }}" --ref bump-changelog
