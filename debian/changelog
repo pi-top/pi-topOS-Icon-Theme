@@ -1,4 +1,4 @@
-pi-topos-icon-theme (2.1.1-1) bookworm; urgency=medium
+pi-topos-icon-theme (2.2.0-1) bookworm; urgency=medium
 
   * Only check the release version when releasing
   * Build the changelog PR when it is created or updated
